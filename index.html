@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Carrossel Ajustado 1204x483</title>
+<title>Carrossel Ajustado 1204x483 - Autoplay</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -17,8 +17,9 @@
   }
   .carousel {
     position: relative;
-    width: 1204px;
-    height: 483px;
+    width: 100%;
+    max-width: 1204px;
+    aspect-ratio: 1204 / 483;
     overflow: hidden;
     border-radius: 8px;
     background: #111;
@@ -78,7 +79,7 @@
 </head>
 <body>
 
-<div class="carousel">
+<div class="carousel" id="carousel">
   <div class="slides" id="slides">
     <div class="slide" style="background-image: url('noticia1/1.png');"></div>
     <div class="slide" style="background-image: url('noticia1/2.png');"></div>
@@ -93,8 +94,10 @@
 
 <script>
   const slides = document.getElementById("slides");
+  const carousel = document.getElementById("carousel");
   const totalSlides = slides.children.length;
   let currentSlide = 0;
+  let autoplayInterval;
 
   function updateDots() {
     const dots = document.querySelectorAll('.dot');
@@ -109,6 +112,12 @@
     updateDots();
   }
 
+  function goToSlide(index) {
+    currentSlide = index;
+    slides.style.transform = `translateX(-${index * 100}%)`;
+    updateDots();
+  }
+
   function createDots() {
     const dotsContainer = document.getElementById('dots');
     for (let i = 0; i < totalSlides; i++) {
@@ -116,15 +125,34 @@
       dot.classList.add('dot');
       if (i === 0) dot.classList.add('active');
       dot.onclick = () => {
-        currentSlide = i;
-        slides.style.transform = `translateX(-${i * 100}%)`;
-        updateDots();
+        goToSlide(i);
+        resetAutoplay();
       };
       dotsContainer.appendChild(dot);
     }
   }
 
+  function startAutoplay() {
+    autoplayInterval = setInterval(() => {
+      moveSlide(1);
+    }, 4000);
+  }
+
+  function stopAutoplay() {
+    clearInterval(autoplayInterval);
+  }
+
+  function resetAutoplay() {
+    stopAutoplay();
+    startAutoplay();
+  }
+
   createDots();
+  startAutoplay();
+
+  // Pause autoplay on mouse enter, resume on mouse leave
+  carousel.addEventListener('mouseenter', stopAutoplay);
+  carousel.addEventListener('mouseleave', startAutoplay);
 </script>
 
 </body>
